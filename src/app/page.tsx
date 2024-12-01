@@ -12,6 +12,7 @@ export default function Home() {
           <Button onClick={() => router.push("/view-template") }>View templates</Button>
           <Button onClick={() => router.push("/edit-template") }>Edit templates</Button>
           <Button onClick={() => router.push("/create-template") }>Create templates</Button>
+          <Button onClick={() => router.push("/test") }>TESTING PAGE</Button>
         </div >
         
       </main>
