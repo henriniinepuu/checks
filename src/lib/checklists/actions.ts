@@ -2,6 +2,9 @@
 import { neon } from "@neondatabase/serverless";
 
 export async function getCustomers() {
+    console.log(process.env.database_url);
+    console.log(process.env);
+    
     const sql = neon(process.env.database_url!);
     const customer_data = await sql`SELECT * FROM customer`;
     return customer_data;
