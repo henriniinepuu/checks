@@ -1,4 +1,4 @@
-import { SelectCustomerCard } from '@/components/templates/select-customer-card';
+import { SelectCustomerCard } from '@/components/checklists/select-customer-card';
 
 export default function TestPage() {
 
