@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+
 import {
   Card,
   CardContent,
@@ -10,11 +11,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Switch } from "@/components/ui/switch"
 import { useEffect, useState } from "react";
 import { getCustomerFromChecklist, getCustomerName, getTasks } from "@/lib/checklists/actions";
 import { usePathname } from "next/navigation";
-import { AddNewTask } from "./add-new-task-modal";
-import { EditTask } from "./edit-task-modal"
+
 
 type CardProps = React.ComponentProps<typeof Card>
 
@@ -52,7 +53,7 @@ useEffect(() => {
 
 
   return (
-    <Card {...props}>
+    <Card className="min-w-96 max-w-500px"{...props}>
       <CardHeader className="text-center">
 
         <CardTitle>
@@ -69,15 +70,11 @@ useEffect(() => {
       <CardContent>
         <div className="pt-3 flex justify-between items-center">
           <div className="font-bold">OS tasks</div> 
-          <AddNewTask 
-            taskGroupId={1}
-            checklistId={checklistId}
-          />
         </div>
         
-        <div className="pt-3 ">
+        <div className="pt-3">
           {tasks.filter((task) => task.groupid === 1).map((tasks, index) => (
-            <div className="flex justify-between m-2 p-2 outline-dotted outline-2 outline-muted rounded-md" key={index}>
+            <div className="flex justify-between" key={index}>
               <div
                 className=" items-start pb-4 last:mb-0 last:pb-0"
               >
@@ -92,8 +89,8 @@ useEffect(() => {
                 </div>
                 
               </div>
-              <div className="flex items-center ml-3">
-                <EditTask />
+              <div className="ml-3">
+                <Switch />
               </div>
             </div>
             
@@ -103,10 +100,6 @@ useEffect(() => {
         <Separator />
         <div className="pt-3 flex justify-between items-center">
           <div className="font-bold">User profile tasks</div> 
-          <AddNewTask 
-            taskGroupId={2} 
-            checklistId={checklistId}
-          />
         </div>
         <div className="pt-3">
           {tasks.filter((task) => task.groupid === 2).map((tasks, index) => (
@@ -125,8 +118,8 @@ useEffect(() => {
                 </div>
                 
               </div>
-              <div className="ml-3 items-center">
-                <EditTask />
+              <div className="ml-3">
+                <Switch />
               </div>
             </div>
             
@@ -136,10 +129,6 @@ useEffect(() => {
         <Separator />
         <div className="pt-3 flex justify-between items-center">
           <div className="font-bold">Last steps</div> 
-          <AddNewTask 
-            taskGroupId={3}
-            checklistId={checklistId}
-          />
         </div>
         <div className="pt-3">
           {tasks.filter((task) => task.groupid === 3).map((tasks, index) => (
@@ -159,7 +148,7 @@ useEffect(() => {
                 
               </div>
               <div className="ml-3">
-                <EditTask />
+                <Switch />
               </div>
             </div>
             
@@ -169,7 +158,7 @@ useEffect(() => {
       </CardContent>
       <CardFooter>
         <Button className="w-full">
-          Generate PDF
+          Save to Halo ticket
         </Button>
       </CardFooter>
     </Card>
