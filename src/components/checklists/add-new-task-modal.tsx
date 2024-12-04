@@ -1,3 +1,4 @@
+import React from 'react';
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -7,19 +8,27 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Plus } from "lucide-react"
-import React from 'react'
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Plus } from "lucide-react";
 import { Textarea } from "../ui/textarea";
 import { addTask } from "@/lib/checklists/actions";
 
-interface AddNewTaskProps {
-    taskGroupId: number,
-    checklistId: number,
+interface Task {
+    taskid: number;
+    taskname: string;
+    taskinstructions: string;
+    groupid: number;
+    tasksequence: number;
 }
 
-export function AddNewTask({ taskGroupId, checklistId }: AddNewTaskProps) {
+interface AddNewTaskProps {
+    taskGroupId: number;
+    checklistId: number;
+    onSubmit: (addedTask: Task) => void;
+}
+
+export function AddNewTask({ taskGroupId, checklistId, onSubmit }: AddNewTaskProps) {
     const [taskName, setTaskName] = React.useState("");
     const [taskInstructions, setTaskInstructions] = React.useState("");
     const [isLoading, setIsLoading] = React.useState(false);
@@ -35,9 +44,18 @@ export function AddNewTask({ taskGroupId, checklistId }: AddNewTaskProps) {
 
     const handleSubmit = async () => {
         setIsLoading(true);
-        await addTask(taskName, taskInstructions, taskGroupId, checklistId);
+        const { taskid, tasksequence } = await addTask(taskName, taskInstructions, taskGroupId, checklistId);
         setIsLoading(false);
         setIsOpen(false);
+
+        // Call the onSubmit prop with the new task
+        onSubmit({
+            taskid,
+            taskname: taskName,
+            taskinstructions: taskInstructions,
+            groupid: taskGroupId,
+            tasksequence,
+        });
     };
 
     return (
