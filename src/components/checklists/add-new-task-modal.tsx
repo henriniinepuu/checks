@@ -22,6 +22,8 @@ interface AddNewTaskProps {
 export function AddNewTask({ taskGroupId, checklistId }: AddNewTaskProps) {
     const [taskName, setTaskName] = React.useState("");
     const [taskInstructions, setTaskInstructions] = React.useState("");
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [isOpen, setIsOpen] = React.useState(false);
 
     const handleTaskNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTaskName(event.target.value);
@@ -31,12 +33,15 @@ export function AddNewTask({ taskGroupId, checklistId }: AddNewTaskProps) {
         setTaskInstructions(event.target.value);
     };
 
-    const handleSubmit = () => {
-        addTask(taskName, taskInstructions, taskGroupId, checklistId);
+    const handleSubmit = async () => {
+        setIsLoading(true);
+        await addTask(taskName, taskInstructions, taskGroupId, checklistId);
+        setIsLoading(false);
+        setIsOpen(false);
     };
 
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
             <DialogTrigger asChild>
                 <Button variant="ghost" size="xs">
                     <Plus />
@@ -70,7 +75,9 @@ export function AddNewTask({ taskGroupId, checklistId }: AddNewTaskProps) {
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button onClick={handleSubmit} className="w-full">Submit</Button>
+                    <Button onClick={handleSubmit} disabled={isLoading} className="w-full">
+                        {isLoading ? "Submitting..." : "Submit"}
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

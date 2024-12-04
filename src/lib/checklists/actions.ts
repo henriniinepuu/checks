@@ -43,22 +43,22 @@ export async function addTask(
 ) {
     const sql = neon(process.env.DATABASE_URL!);
     const tasks_data = await sql`
-        INSERT INTO tasks (
-            taskid, 
-            taskname, 
-            taskinstructions, 
-            groupid, 
-            checklistid, 
-            tasksequence
-        )
+        INSERT INTO tasks (taskid, taskname, taskinstructions, groupid, checklistid, tasksequence)
         SELECT 
             COALESCE(MAX(tasks.taskid), 0) + 1,
             ${taskname},
             ${taskinstructions},
             ${taskgroupid},
             ${checklistid},
-            NULL
-        FROM tasks;
-    `;
+            COALESCE(MAX(t.tasksequence), 0) + 1
+        FROM tasks
+        LEFT JOIN (
+            SELECT checklistid, groupid, MAX(tasksequence) as tasksequence
+            FROM tasks
+            WHERE checklistid = ${checklistid} AND groupid = ${taskgroupid}
+            GROUP BY checklistid, groupid
+        ) t ON t.checklistid = ${checklistid} AND t.groupid = ${taskgroupid}
+
+        ;`;
     return tasks_data;
 }

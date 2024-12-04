@@ -77,9 +77,9 @@ useEffect(() => {
         
         <div className="pt-3 ">
           {tasks.filter((task) => task.groupid === 1).map((tasks, index) => (
-            <div className="flex justify-between m-2 p-2 outline-dotted outline-2 outline-muted rounded-md" key={index}>
+            <div className="flex justify-between m-2 p-2 outline-dotted outline-2 outline-muted rounded-md bg-neutral-50" key={index}>
               <div
-                className=" items-start pb-4 last:mb-0 last:pb-0"
+                className=" items-start last:mb-0 last:pb-0"
               >
                 <div className="space-y-1">
                   <p className="text-sm font-medium leading-none">
@@ -110,9 +110,9 @@ useEffect(() => {
         </div>
         <div className="pt-3">
           {tasks.filter((task) => task.groupid === 2).map((tasks, index) => (
-            <div className="flex justify-between" key={index}>
+            <div className="flex justify-between m-2 p-2 outline-dotted outline-2 outline-muted rounded-md bg-neutral-50" key={index}>
               <div
-                className=" items-start pb-4 last:mb-0 last:pb-0"
+                className=" items-start last:mb-0 last:pb-0"
               >
                 <div className="space-y-1">
                   <p className="text-sm font-medium leading-none">
@@ -143,9 +143,9 @@ useEffect(() => {
         </div>
         <div className="pt-3">
           {tasks.filter((task) => task.groupid === 3).map((tasks, index) => (
-            <div className="flex justify-between" key={index}>
+            <div className="flex justify-between m-2 p-2 outline-dotted outline-2 outline-muted rounded-md bg-neutral-50" key={index}>
               <div
-                className=" items-start pb-4 last:mb-0 last:pb-0"
+                className=" items-start last:mb-0 last:pb-0"
               >
                 <div className="space-y-1">
                   <p className="text-sm font-medium leading-none">
