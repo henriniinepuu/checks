@@ -72,7 +72,7 @@ export function AddNewCustomer({onCustomerAdded}: {onCustomerAdded: () => void})
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button onClick={handleSubmit} disabled={isLoading} className="w-full">
+                    <Button onClick={handleSubmit} disabled={isLoading || customerName.trim().length === 0} className="w-full">
                         {isLoading ? "Submitting..." : "Submit"}
                     </Button>
                 </DialogFooter>
