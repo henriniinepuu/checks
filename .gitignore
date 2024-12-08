@@ -41,3 +41,9 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# IDE-specific files
+.idea/
+.vscode/
+*.swp
+*.swo

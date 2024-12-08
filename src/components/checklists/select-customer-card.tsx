@@ -30,6 +30,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { getCustomers, getChecklists } from '@/lib/checklists/actions';
 import { useRouter } from "next/navigation";
 import { AddNewCustomer } from "./add-new-customer-modal"
+import { AddNewChecklist } from "./add-new-checklist-modal"
 
 type CardProps = React.ComponentProps<typeof Card>
 
@@ -62,11 +63,25 @@ export function SelectCustomerCard({ ...props }: CardProps) {
         setCustomers(customersData);
     };
 
+    const fetchChecklists = async () => {
+        if (selectedCustomerId) {
+            const checklistData = await getChecklists(selectedCustomerId) as Checklist[];
+            setChecklists(checklistData);
+        } else {
+            setChecklists([]);
+        }
+    };
+
     const memoizedFetchCustomers = useCallback(fetchCustomers, []);
+    const memoizedFetchChecklists = useCallback(fetchChecklists, [selectedCustomerId]);
 
     useEffect(() => {
         memoizedFetchCustomers();
     }, [memoizedFetchCustomers]);
+
+    useEffect(() => {
+        memoizedFetchChecklists();
+    }, [memoizedFetchChecklists]);
 
     useEffect(() => {
         const fetchChecklists = async () => {
@@ -151,7 +166,16 @@ export function SelectCustomerCard({ ...props }: CardProps) {
                                 </Command>
                             </PopoverContent>
                 </Popover>
-                <div className="pt-3">Select checklist</div>
+                <div className="flex justify-between">
+                    <div className="pt-3">
+                        Select checklist
+                    </div>
+                    <div>
+                        {selectedCustomerId && (
+                            <AddNewChecklist onChecklistAdded={memoizedFetchChecklists} customerId={selectedCustomerId} />
+                        )}
+                    </div>
+                </div>
                 <Popover open={selectChecklistPopup} onOpenChange={setSelectChecklistPopup}>
                     <PopoverTrigger asChild>
                     <Button

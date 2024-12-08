@@ -107,3 +107,35 @@ export async function addCustomer(
 
     return customer_data[0].customerid;
 }
+
+export async function addChecklist(
+    checklistName: string,
+    customerId: number
+) {
+    const sql = neon(process.env.DATABASE_URL!);
+    
+    const existingChecklist = await sql`
+        SELECT checklistname
+        FROM checklists
+        WHERE LOWER(checklistname) = LOWER(${checklistName})
+    `;
+    if (existingChecklist.length > 0) {
+        throw new Error(`Customer "${checklistName}" already exists`);
+    }
+    
+    const checklist_data = await sql`
+    INSERT INTO checklists (
+        checklistid,
+        checklistname,
+        customerid
+    ) 
+    VALUES (
+        (SELECT COALESCE(MAX(checklistid), 0) + 1 FROM checklists),
+        ${checklistName},
+        ${customerId}
+    )
+    RETURNING checklistid;`;
+    console.log(checklist_data);
+    return checklist_data[0].checklistid;
+}
+
