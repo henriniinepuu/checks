@@ -2,10 +2,12 @@
 import { neon } from "@neondatabase/serverless";
 
 export async function getCustomers() {
-
     const sql = neon(process.env.DATABASE_URL!);
-    const customer_data = await sql`SELECT * FROM customer`;
-    return customer_data;
+    const customersData = await sql`SELECT 
+        customerid, 
+        customername 
+    FROM customer`;
+    return customersData;
 }
 export async function getCustomerName(customerId: number) {
     const sql = neon(process.env.DATABASE_URL!);
@@ -28,7 +30,14 @@ export async function deleteTask(taskId: number) {
 
 export async function getChecklists(customerId: number) {
     const sql = neon(process.env.DATABASE_URL!);
-    const checklist_data = await sql`SELECT * FROM checklists WHERE customerid = ${customerId}`;
+    const checklist_data = await sql`
+        SELECT 
+            checklistid as "checklistId",
+            checklistname as "checklistName",
+            customerid as "customerId"
+        FROM checklists 
+        WHERE customerid = ${customerId}
+    `;
     return checklist_data;
 }
 
@@ -71,4 +80,30 @@ export async function addTask(
         RETURNING taskid, tasksequence;`;
 
     return tasks_data[0];
+}
+
+export async function addCustomer(
+    customerName: string,
+): Promise<number> {
+    const sql = neon(process.env.DATABASE_URL!);
+
+    const existingCustomer = await sql`
+        SELECT customername 
+        FROM customer 
+        WHERE LOWER(customername) = LOWER(${customerName})
+    `;
+    if (existingCustomer.length > 0) {
+        throw new Error(`Customer "${customerName}" already exists`);
+    }
+
+    const customer_data = await sql`
+        INSERT INTO customer (customerid, customername)
+        SELECT 
+            COALESCE(MAX(customer.customerid), 0) + 1 as customerid,
+            ${customerName}
+        FROM customer
+        RETURNING customerid
+    `;
+
+    return customer_data[0].customerid;
 }

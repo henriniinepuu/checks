@@ -26,21 +26,23 @@ import {
 import { Check, ChevronsUpDown } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { getCustomers, getChecklists } from '@/lib/checklists/actions';
 import { useRouter } from "next/navigation";
+import { AddNewCustomer } from "./add-new-customer-modal"
 
 type CardProps = React.ComponentProps<typeof Card>
 
 export function SelectCustomerCard({ ...props }: CardProps) {
+
     interface Customer {
         customerid: number;
         customername: string;
       }
       
       interface Checklist {
-        checklistid: number; 
-        checklistname: string;
+        checklistId: number; 
+        checklistName: string;
       }
 
     const router = useRouter()
@@ -55,36 +57,25 @@ export function SelectCustomerCard({ ...props }: CardProps) {
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [checklists, setChecklists] = useState<Checklist[]>([]);
 
-    const [customerLoading, setCustomerLoading] = useState(true);
-    const [checklistLoading, setChecklistLoading] = useState(true);
+    const fetchCustomers = async () => {
+        const customersData = await getCustomers() as Customer[];
+        setCustomers(customersData);
+    };
+
+    const memoizedFetchCustomers = useCallback(fetchCustomers, []);
 
     useEffect(() => {
-        const fetchCustomers = async () => {
-        try {
-            const customerData = await getCustomers() as Customer[];
-            setCustomers(customerData);
-        } catch (error) {
-            console.error("Error fetching customers:", error);
-        } finally {
-            setCustomerLoading(false);
-        }
-        };
-
-        fetchCustomers();
-    }, []);
+        memoizedFetchCustomers();
+    }, [memoizedFetchCustomers]);
 
     useEffect(() => {
         const fetchChecklists = async () => {
             if (selectedCustomerId) {
-                try {
-                    setChecklistLoading(true);
+
                     const checklistData = await getChecklists(selectedCustomerId) as Checklist[];
                     setChecklists(checklistData);
-                } catch (error) {
-                    console.error("Error fetching checklists:", error);
-                } finally {
-                    setChecklistLoading(false);
-                }
+                    console.log(checklistData);
+
             } else {
                 setChecklists([]);
             }
@@ -94,30 +85,30 @@ export function SelectCustomerCard({ ...props }: CardProps) {
     }, [selectedCustomerId]);
     
 
-    if (customerLoading) {
-        return <div>Loading...</div>;
-    }
-
     return (
 
 
         <Card className="min-w-96 max-w-500px" {...props}>
             <CardHeader>
                 <CardTitle className="text-center">
-                    <div>Select template to view</div>
+                    <div>Select checklist to view</div>
                 </CardTitle>
                 <div>
                     <CardDescription className="text-center">
-                        View templates for customers
+                        View checklists for customers
                     </CardDescription>
                 </div>
             </CardHeader>
             <Separator />
             <CardContent >
-                <div className="pt-3">Customer name</div>
-
-                <Popover open={selectCustomerPopup} onOpenChange={setSelectCustomerPopup}>
-
+                <div className="flex justify-between">
+                    <div className="pt-3">Customer name</div>
+                    <AddNewCustomer onCustomerAdded={memoizedFetchCustomers} />
+                </div>
+                <Popover 
+                    open={selectCustomerPopup} 
+                    onOpenChange={setSelectCustomerPopup}
+                >
                     <PopoverTrigger asChild>
                     <Button
                         variant="outline"
@@ -134,17 +125,16 @@ export function SelectCustomerCard({ ...props }: CardProps) {
                                     <CommandInput placeholder="Search customer" />
                                     <CommandList>
                                         <CommandEmpty>No customer found.</CommandEmpty>
-                                        <CommandGroup>
+                                        <CommandGroup key="customers-group">
                                             {customers.map((customer) => (
                                                 <CommandItem
-                                                    key={customer.customerid}
+                                                    key={`customer-${customer.customerid}`}
                                                     value={customer.customername}
                                                     onSelect={() => {
-                                                        setSelectedCustomer(customer.customername)
+                                                        setSelectedCustomer(customer.customername);
                                                         setSelectCustomerPopup(false);
                                                         setSelectedCustomerId(customer.customerid);
-                                                        setSelectedChecklist('')
-
+                                                        setSelectedChecklist('');
                                                     }}
                                                 >
                                                     {customer.customername}
@@ -169,12 +159,13 @@ export function SelectCustomerCard({ ...props }: CardProps) {
                         role="combobox"
                         aria-expanded={selectChecklistPopup}
                         className="justify-between w-full"
-                        disabled={!selectedCustomer} // Disable until a customer is selected
-                        onLoad={() => {
-                            <div>Loading checklists</div>
-                        }}
+                        disabled={!selectedCustomer}
                     >
-                        {!selectedCustomer ? "Select customer" : !selectedChecklist ? "Select checklist" : selectedChecklist}
+                        {!selectedCustomer 
+                            ? "Select customer" 
+                            : !selectedChecklist 
+                                ? "Select checklist" 
+                                : selectedChecklist}
                         <ChevronsUpDown className="opacity-50" />
                         </Button>
                     </PopoverTrigger>
@@ -183,24 +174,23 @@ export function SelectCustomerCard({ ...props }: CardProps) {
                                     <CommandInput placeholder="Search checklist" />
                                     <CommandList>
                                         <CommandEmpty>No checklist found.</CommandEmpty>
-                                        <CommandGroup>
-                                            {
-                                            checklists.map((checklist) => (
+                                        <CommandGroup key="checklists-group">
+                                            {checklists.map((checklist) => (
                                                 <CommandItem
-                                                    key={checklist.checklistid}
-                                                    value={checklist.checklistname}
+                                                    key={`checklist-${checklist.checklistId}`}
+                                                    value={checklist.checklistName}
                                                     onSelect={() => {
-                                                        setSelectedChecklist(checklist.checklistname)
-                                                        setSelectedChecklistId(checklist.checklistid)
+                                                        setSelectedChecklist(checklist.checklistName)
+                                                        setSelectedChecklistId(checklist.checklistId)
                                                         setSelectChecklistPopup(false);
-
+                                                        console.log(checklists);
                                                     }}
                                                 >
-                                                    {checklist.checklistname}
+                                                    {checklist.checklistName}
                                                     <Check
                                                         className={cn(
                                                             "ml-auto",
-                                                            selectedChecklist === checklist.checklistname ? "opacity-100" : "opacity-0"
+                                                            selectedChecklist === checklist.checklistName ? "opacity-100" : "opacity-0"
                                                         )}
                                                     />
                                                 </CommandItem>
@@ -214,7 +204,7 @@ export function SelectCustomerCard({ ...props }: CardProps) {
             <CardFooter>
                 <Button 
                     onClick={() => router.push(`/view-checklist/${selectedChecklistId}`)} 
-                    disabled={!selectedChecklistId || checklistLoading}
+                    disabled={!selectedChecklistId}
                     className="w-full"
                     >
                     Open template
