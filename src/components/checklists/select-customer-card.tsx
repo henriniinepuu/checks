@@ -83,21 +83,21 @@ export function SelectCustomerCard({ ...props }: CardProps) {
         memoizedFetchChecklists();
     }, [memoizedFetchChecklists]);
 
-    useEffect(() => {
-        const fetchChecklists = async () => {
-            if (selectedCustomerId) {
+    // useEffect(() => {
+    //     const fetchChecklists = async () => {
+    //         if (selectedCustomerId) {
 
-                    const checklistData = await getChecklists(selectedCustomerId) as Checklist[];
-                    setChecklists(checklistData);
-                    console.log(checklistData);
+    //                 const checklistData = await getChecklists(selectedCustomerId) as Checklist[];
+    //                 setChecklists(checklistData);
+    //                 console.log(checklistData);
 
-            } else {
-                setChecklists([]);
-            }
-        };
+    //         } else {
+    //             setChecklists([]);
+    //         }
+    //     };
 
-        fetchChecklists();
-    }, [selectedCustomerId]);
+    //     fetchChecklists();
+    // }, [selectedCustomerId]);
     
 
     return (
