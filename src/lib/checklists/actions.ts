@@ -115,9 +115,11 @@ export async function addChecklist(
     const sql = neon(process.env.DATABASE_URL!);
     
     const existingChecklist = await sql`
-        SELECT checklistname
+        SELECT checklistname,
+        customerid
         FROM checklists
         WHERE LOWER(checklistname) = LOWER(${checklistName})
+        AND customerid = ${customerId}
     `;
     if (existingChecklist.length > 0) {
         throw new Error(`Customer "${checklistName}" already exists`);
